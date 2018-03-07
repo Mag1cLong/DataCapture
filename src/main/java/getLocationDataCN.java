@@ -12,8 +12,9 @@ import java.util.Iterator;
  */
 public class getLocationDataCN {
     public static void main(String[] args) throws Exception {
+        long t0 = System.currentTimeMillis();
         String baseUrl = "http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2016/";
-        Document provinceDoc = Jsoup.connect(baseUrl).get();
+        Document provinceDoc = getDoc(5, baseUrl);
         Elements provinceTrs = provinceDoc.getElementsByClass("provincetr");
         Iterator<Element> iterator = provinceTrs.iterator();
         while (iterator.hasNext()) {
@@ -24,7 +25,7 @@ public class getLocationDataCN {
                 Element aTag = provinceTd.getElementsByTag("a").first();
                 String provinceHref = aTag.attr("href");
                 String provinceName = aTag.text();
-                Document cityDoc = Jsoup.connect(baseUrl + provinceHref).get();
+                Document cityDoc = getDoc(5, baseUrl + provinceHref);
                 Elements cityTrs = cityDoc.getElementsByClass("citytr");
                 Iterator<Element> iterator2 = cityTrs.iterator();
                 while (iterator2.hasNext()) {
@@ -43,7 +44,7 @@ public class getLocationDataCN {
                         cityName = cityATags.first().text();
                     }
                     if (cityHref != null) {
-                        Document areaDoc = Jsoup.connect(baseUrl + cityHref).get();
+                        Document areaDoc = getDoc(5, baseUrl + cityHref);
                         Elements areaTrs = areaDoc.getElementsByClass("countytr");
                         Iterator<Element> iterator3 = areaTrs.iterator();
                         while (iterator3.hasNext()) {
@@ -62,7 +63,7 @@ public class getLocationDataCN {
                                 areaName = areaATags.first().text();
                             }
                             if (areaHref != null) {
-                                Document townDoc = Jsoup.connect(baseUrl + provinceHref.replaceAll(".html", "") + "/" + areaHref).get();
+                                Document townDoc = getDoc(5, baseUrl + provinceHref.replaceAll(".html", "") + "/" + areaHref);
                                 Elements townTrs = townDoc.getElementsByClass("towntr");
                                 Iterator<Element> iterator4 = townTrs.iterator();
                                 while (iterator4.hasNext()) {
@@ -83,7 +84,7 @@ public class getLocationDataCN {
                                     if (townHref != null) {
                                         String subUrl = cityHref.substring(cityHref.indexOf("/") + 3, cityHref.indexOf("."));
                                         String url = baseUrl + provinceHref.replaceAll(".html", "") + "/" + subUrl + "/" + townHref;
-                                        Document villageDoc = Jsoup.connect(url).get();
+                                        Document villageDoc = getDoc(5, url);
                                         Elements villageTrs = villageDoc.getElementsByClass("villagetr");
                                         Iterator<Element> iterator5 = villageTrs.iterator();
                                         while (iterator5.hasNext()) {
@@ -102,5 +103,21 @@ public class getLocationDataCN {
                 }
             }
         }
+        long t1 = System.currentTimeMillis();
+        System.out.println("共耗时:" + (t1 - t0) / 1000 / 60 + " min");
+    }
+
+    static Document getDoc(Integer retryCount, String url) {
+        Document doc = null;
+        while (retryCount > 0) {
+            try {
+                doc = Jsoup.connect(url).get();
+                break;
+            } catch (Exception e) {
+                retryCount--;
+                getDoc(retryCount, url);
+            }
+        }
+        return doc;
     }
 }
