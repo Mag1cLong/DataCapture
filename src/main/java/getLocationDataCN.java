@@ -107,17 +107,15 @@ public class getLocationDataCN {
         System.out.println("共耗时:" + (t1 - t0) / 1000 / 60 + " min");
     }
 
-    static Document getDoc(Integer retryCount, String url) {
-        Document doc = null;
+    static Document getDoc(int retryCount, String url)throws Exception {
         while (retryCount > 0) {
             try {
-                doc = Jsoup.connect(url).get();
-                break;
+                return Jsoup.connect(url).get();
             } catch (Exception e) {
                 retryCount--;
                 getDoc(retryCount, url);
             }
         }
-        return doc;
+        throw new Exception("获取文档失败，重试次数已用完");
     }
 }
