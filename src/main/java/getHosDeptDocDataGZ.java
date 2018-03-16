@@ -11,7 +11,7 @@ import java.util.Iterator;
  * Created by jcl on 2018/3/16
  */
 @SuppressWarnings("ALL")
-public class getHosDeptDocDataGZv {
+public class getHosDeptDocDataGZ {
     private static final String BASE_URL = "http://www.guahao.gov.cn";//首页
     private static final String DEPT_URL = "/deplist.xhtml";//科室列表,参数:HIS_CD
     private static final int[] hosIds = {1051, 1004, 100201, 100203, 100202};//医院id
